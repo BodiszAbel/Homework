@@ -1,0 +1,159 @@
+x >x.txt 2>x.txt helyett:
+	&> x.txt (linux)
+	>x.txt 2>&1
+	2> x.txt 1>&2
+kiterjesztés csak windowsban van
+	kiterjesztés és fájlnév nem ugyanaz
+attribnál a -a -t ne vegyük le csak amit a feladat kér
+
+módotsítás idő szerint:   -c kapcsoló
+
+ln egyik.txt egyik2.txt
+ls -li
+rm egyik2.txt (nem biztos h letörli a file-t, hanem lehet h unlinkel(egy linket eltávolít))
+és -li
+hardlinkre könyvtárat nem lehet csinálni pl : ln mappa/mappa2 (ez nem műkszik)
+a/b: ln..c
+a/b/c = a
+szimbolikus linket lehet
+
+ln -d csak a superuser tudja létrehozni, viszont neki sincsen garantálva
+
+ln -s mappa/mappa2
+ls -l
+
+tudok hivatkozni a szülőmappára egy mappán belül
+a szimbolikus link az egy szöveges fájl
+a szimbolikus linket fellehet oldani hogy egy olyan nevet kapunk amibe egy szimlink sincs -> ez a kanonikus név, a fájl kanonikus neves
+
+Új témakör : linuxban a jogosultságok kérdése -> jogosultságok (filemode)
+filetulajdonos felhasználója
+pl bodiszabel a mellette lévő az állomány tulajdonos csoportja
+pl bodiszabel Staff
+ez pl akkor jön elő ha beírod, hogy : ls -l
+chown - change owner -> a tulajdonos és a tulajdonos csoportot tudod megváltoztatni
+chown ujtulajdonos:csoport file
+root -> azt csinála file-al amit akar
+ha ls -l-nél az -rwx-r--xr-- 
+		  |    |   |
+		  |    |   others
+		  |    |
+		  |   tulajdonos csoport tagjai
+		  |
+		 tulajdonos felhasználó
+akkor 
+-
+l
+d
+p
+s
+c
+b
+kövi hármas block : a felhasználó jogosultségait
+
+
+jogosultságok:
+	r-read
+	w-write
+	x-execute (kétféle képpen kell értelmezni, attól függően, hogy reguláris fájlra(futtatható, végrehajtható állomány -> program vagy mappára vonatkozik(keresési,belemenési jog)
+	--------
+	s-setuid, 
+	t-sticky bit
+chmod alakjai:
+	chmod <users><operators><jogok> <fileok>
+		u(user)  |  =  |   r or u|
+		g(group) |  +  |   w	g|
+		o(others)|  -  |   x	o|
+		a-all		   X	 |
+		ug		   s	 |
+		go		   t	 |
+		(ezek kombinálhatóak)
+
+pár pl ezekre:
+
+chmod g+w x.txt
+ls -l x.txt
+
+chmod o+w x.txt
+ls -l x.txt
+
+chmod u=o x.txt
+ls -l x.txt
+
+beleiras: 
+cat > x.txt -> nincs írási jogom
+
+jog visszaadás
+chmod u+w x.txt
+ls -l x.txt
+
+chmod a+w x.txt
+ls -l x.txt
+
+cat > x.txt
+echo Ez a szkriptem.
+echo Most kiírom a mappa tartalmát:
+ls -l
+Ctrl + D
+./x.txt
+
+cd mappa
+ls -la
+
+chmod -x mappa
+ls -ld mappa
+ -> nincs jog gec
+cd mappa 
+-> ehhez sincs boss vagy csak ehhez nincs
+
+touch mappa/valami ( ehhez vissza kell adni a jogot, hogy egy file-t beletudj rakni)
+
+chmod -r mappa
+
+belemenni beletudok:
+cd mappa
+listázni nem tudom: 
+ls mappa -la
+
+rm mappa/valami
+nem törlődne le -> ahhoz hogy megszűntesse ezt az 
+dogába tulajdonságokat adni stb 
+
+
+van egy másik alakja a chmod-nak:
+
+chmod 0754 <fileok>
+       
+       s ,u,g,o
+       t
+(az s a nullához meg a t, u a 7-hez, g az 5-höz, 4 az o-hoz)
+
+a 7-eshez: rwx
+az 5-öshöz: r-x
+a 4-eshez: r--
+
+pl: chmod 0754 x.txt
+	ls -l x.txt
+
+chmod o+X x.txt --> az others is megkapja az x jogot, a X azt csinálja, hogy megadja másnak is az x jogot ,ha már van kis x jog
+		ha teljesen leszeded az x jogot akkor nem adja az othernek az x jogot
+		ha könyvtárra adom akkor ugyan azt csinálja mint a kis x
+
+két speciális jog:
+s(setuid,setgid) - lehet a usernek az x-ének a helyén, meg a groupnak az x-ének a helyén 
+t
+
+real user ID(ruid)
+effective user ID(euid)
+van groupra is -> rgid
+		  egid
+
+aki létrrehozza a folyamatot ő a real user
+effective user -> akinek a nevén, akinek a jogaival fut a feladat
+
+pl.: chmod u+s x.txt ( piros lesz és az x helyett s, ebben a pillanatban egy setuid-os program)
+setgid : chmod g+s x.txt ( csak a groupokra, nem az elindito csoport jogaival fog futni, hanem a tulajdonos jogaival)
+passwd -> meglehet vele változtatni a jelszavad
+ha kiiratjuka passswd-t a jelszo helyen egy x van 
+a passwd setuidos program -> a tulaj jogaival fog futni, áttudod így írni a jelszavad
+dogába csak az kell h hogy kell használni
